@@ -1,0 +1,44 @@
+/*
+Name: Emmanuel Munoz
+Date: November 15, 2018
+Section: CSE 154 AJ
+This is the .css file for the spec lister website. It gives the website a consistent look and feel
+and also adds the styling for the different text formatting given by a spec
+*/
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+html, body {
+  height: 100%;
+  width: 99%;
+}
+
+textarea {
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: #1b69b6;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+code {
+  background-color: #fbe5e1;
+  color: #c0341d;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.spec-line {
+  border: 2px solid black;
+  padding: 10px;
+  margin: 10px;
+}

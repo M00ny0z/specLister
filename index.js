@@ -354,11 +354,15 @@
     let fullLines = [];
     let pos = 0;
     while(overallSpec.length != 0) {
-      if(fullLines.length === 34) {
+      if(fullLines.length === 77) {
         console.log("HERE");
       }
       let currentChar = overallSpec.substring(0, 1);
-      if(currentChar === "#" && isHeader(overallSpec)) {
+      // IF DOESNT CUT NICELY INTO NEXT INDICATOR, CUTS AGAIN TO GET CLEAN CUT
+      if(currentChar === "\n") {
+        let endCut = findNonIndicator(overallSpec);
+        overallSpec = overallSpec.substring(endCut);
+      } else if(currentChar === "#" && isHeader(overallSpec)) {
         // MINUS ONE TO NOT INCLUDE THE SPACE
         // MINUTES TWO TO NOT INCLUDE NEWLINE CHAR
         let headerLine = overallSpec.substring(0, overallSpec.indexOf("\n"));
@@ -370,9 +374,6 @@
         //overallSpec = overallSpec.substring(sectionName.length + 1);
       } else if(currentChar != "*" && fullLines[fullLines.length - 1].startsWith("SECTION")){
         let endCut = findNonIndicator(overallSpec);
-        //if(endCut != -1 && endCut > overallSpec.indexOf("##")) {
-        //  endCut = overallSpec.indexOf("##");
-        //}
         let desc = overallSpec.substring(0, endCut);
         fullLines.push("DESCRIPTION:" + desc);
         overallSpec = overallSpec.substring(desc.length);
@@ -408,6 +409,7 @@
     * @return {Integer} index - The index of the first character that indicates a new spec line
     *                           Returns -1 if not found
   */
+  //// TODO: FIX THE ENDCUT FOR CODEBLOCK DESC TO ENDCUT AT THE END OF THE CODEBLOCK PIECE
   function findNonIndicator(overallSpec) {
     for(let i = 0; i < overallSpec.length; i++) {
       let currentChar = overallSpec.charAt(i);
@@ -424,6 +426,11 @@
             if(overallSpec.indexOf("```") === 0) {
               // PLUS 6 TO INCLUDE THE ``` AT THE END
               return overallSpec.substring(3).indexOf("```") + 6;
+            } else if(isCodeBlockDesc(remainder) && i === 0) {
+              // PLUS 3 TO INCLUDE THE ```
+              let first = overallSpec.substring(0, overallSpec.indexOf("```") + 3);
+              let second = overallSpec.substring(first.length).indexOf("```") + 3;
+              return first.length + second;
             } else {
               return i;
             }

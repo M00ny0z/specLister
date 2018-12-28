@@ -460,14 +460,14 @@
       let currentLine = specByLines[i]
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {
         let newTextContainer;
-        if(currentLine.startsWith("SECTION")) {
-          newTextContainer = document.createElement("h" + currentLine.charAt(currentLine.indexOf(":") - 1));
-        } else {
-          newTextContainer = document.createElement("p");
-        }
         let cleanText = replaceAll(currentLine, "\n", "");
         cleanText = cleanText.substring(cleanText.indexOf(":") + 1);
-        newTextContainer.innerText = cleanText;
+        if(currentLine.startsWith("SECTION")) {
+          newTextContainer = document.createElement("h" + currentLine.charAt(currentLine.indexOf(":") - 1));
+          newTextContainer.innerText = cleanText;
+        } else {
+          newTextContainer = checkCodeByLetters(cleanText);
+        }
         specContainer.appendChild(newTextContainer);
       } else {
         let newLine = checkCodeByLetters(currentLine);
@@ -517,10 +517,13 @@
   */
   function updateList() {
     let specList = document.getElementById("requirements");
-    let specItems = document.querySelectorAll(".toRemove");
+    let specItems = specList.querySelectorAll(".toRemove");
+    let completedItems = document.getElementById("completed");
+    completedItems.classList.remove("hidden");
     while(specItems.length != 0) {
       let index = specItems[0].querySelector("label").innerText.substring(0,1);
       specList.removeChild(specItems[0]);
+      completedItems.appendChild(specItems[0]);
       specItems = document.querySelectorAll(".toRemove");
     }
   }

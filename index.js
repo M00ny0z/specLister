@@ -27,7 +27,7 @@
     // IF TEXT HAS 4 SPACES BEFORE AND THE REST IS SPACE\N\N_4SPACES'''
     let overallSpec = document.getElementById("specField").value;
     //console.log(isCodeBlockDesc(overallSpec));
-    console.log(findNonIndicator(overallSpec));
+    console.log(isCodeBlockDesc(overallSpec));
     // if(isCodeBlock(overallSpec)) {
     //   let codeBlock = document.createElement("div");
     //   overallSpec = createCodeBlock(overallSpec, codeBlock);
@@ -93,6 +93,7 @@
     return overallSpec.indexOf("```") === 0;
   }
 
+  // DONE
   function headerCount(overallSpec) {
     let headerCount = 0;
     let endIndex = 0;
@@ -409,7 +410,6 @@
     * @return {Integer} index - The index of the first character that indicates a new spec line
     *                           Returns -1 if not found
   */
-  //// TODO: FIX THE ENDCUT FOR CODEBLOCK DESC TO ENDCUT AT THE END OF THE CODEBLOCK PIECE
   function findNonIndicator(overallSpec) {
     for(let i = 0; i < overallSpec.length; i++) {
       let currentChar = overallSpec.charAt(i);

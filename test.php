@@ -1,11 +1,9 @@
 <?php
 /*
 FUNCTIONS REMAINING:
-  whichCase
   findEmphRepeat
   combineLines
   findNonIndicator
-  findFirstLetter
 
 FUNCTIONS COMPLETED:
   headerCount
@@ -17,13 +15,16 @@ FUNCTIONS COMPLETED:
   isCodeBlock
   isCodeBlockDesc
   isLink
+  findFirstLetter
+  whichCase
 */
 error_reporting(E_ALL);
 //check_new_file();
 $file = file("files/HW1.md");
 header("Content-type: text/plain");
-$word = "hello";
-echo sub_remain($word, 3);
+$word = "**_hello_**";
+echo which_case($word);
+
 // if(isset($_GET["mode"]) && is_valid_mode($_GET["mode"])) {
 //   header("Content-type: application/json");
 //   $assignments = get_assignments();
@@ -132,7 +133,10 @@ function isHeader($overallSpec) {
 }
 
 function contains($todo, $find) {
-  return strpos($todo, $find) === false;
+  echo $todo . "\n";
+  echo $find . "\n";
+  echo "contains" . strpos($todo, $find) . "\n";
+  return strpos($todo, $find) == true || strpos($todo, $find) == 0;
 }
 
 function char_at($string, $index) {
@@ -221,33 +225,59 @@ function sub_remain($todo, $index) {
   * @param {String} toDo - The word to convert from MD to HTML
   * @return {Integer} index - The index of the first character that isn't * or _
 */
-// function find_first_letter($todo) {
-//   $index = 0;
-//   for($i = 0; $i < strlen($todo); $i++) {
-//     if(substring($todo, 0, 1) == "*" || substring($todo, 0, 1) == "_") {
-//       $todo = substring($todo, 1)
-//     }
-//   }
-// }
-//
-// function findFirstLetter(toDo) {
-//   let index = 0;
-//   for(let i = 0; i < toDo.length; i++) {
-//     if(toDo.substring(0,1) === '*' || toDo.substring(0,1) === '_') {
-//       toDo = toDo.substring(1);
-//       index = index + 1;
-//     } else {
-//       return index;
-//     }
-//   }
-//   return -1;
-// }
+function find_first_letter($todo) {
+  $index = 0;
+  $old_length = strlen($todo);
+  for($i = 0; $i < $old_length; $i++) {
+    if(substring($todo, 0, 1) == "*" || substring($todo, 0, 1) == "_") {
+      $todo = sub_remain($todo, 1);
+      $index = $index + 1;
+    } else {
+      return $index;
+    }
+  }
+  return -1;
+}
 
 
 
 
-
-
-
+/**
+  * Takes a MD code indicator and its value and places it into HTML code tag
+  * Returns the remaining currentLine with the code and associated indication characters removed
+  * @param {String} currentLine - The currentLine with the potential word to be emphasized at
+  *                               the front
+  * @param {HTMLElement} container - The container to place the completed HTMLCOde Element into
+  * @return {Integer} - The case number for the emphasis style,
+  *                     -1 if not supposed to be notEmphasized
+  *                     0 if only italic
+  *                     1 if only bold
+  *                     2 if both
+*/
+function which_case($current_line) {
+  $not_emph = false;
+  $star_count = 0;
+  $line_count = 0;
+  $limit = find_first_letter($current_line);
+  for($i = 0; $i < $limit; $i++) {
+    if(char_at($current_line, $i) == "*") {
+      $star_count = $star_count + 1;
+    } else {
+      $line_count = $line_count + 1;
+    }
+  }
+  $first_indicator = substring($current_line, 0, $limit);
+  echo $first_indicator . "\n";
+  $not_emph = !(contains($current_line, $first_indicator));
+  if($not_emph) {
+    return -1;
+  } else if($star_count == 1 && $line_count == 0 || $line_count == 1 && $star_count == 0) {
+    return 0;
+  } else if($star_count == 2 && $line_count == 0 || $line_count == 2 && $star_count == 0) {
+    return 1;
+  } else if($star_count == 2 && $line_count == 1 || $line_count == 2 && $star_count == 1) {
+    return 2;
+  }
+}
 
 ?>

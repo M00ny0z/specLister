@@ -1,7 +1,6 @@
 <?php
 /*
 FUNCTIONS REMAINING:
-  findEmphRepeat
   combineLines
   findNonIndicator
 
@@ -22,8 +21,8 @@ error_reporting(E_ALL);
 //check_new_file();
 $file = file("files/HW1.md");
 header("Content-type: text/plain");
-$word = "**_hello_**";
-echo which_case($word);
+$word = "hello_**";
+echo find_emph_repeat($word);
 
 // if(isset($_GET["mode"]) && is_valid_mode($_GET["mode"])) {
 //   header("Content-type: application/json");
@@ -133,9 +132,6 @@ function isHeader($overallSpec) {
 }
 
 function contains($todo, $find) {
-  echo $todo . "\n";
-  echo $find . "\n";
-  echo "contains" . strpos($todo, $find) . "\n";
   return strpos($todo, $find) == true || strpos($todo, $find) == 0;
 }
 
@@ -267,7 +263,6 @@ function which_case($current_line) {
     }
   }
   $first_indicator = substring($current_line, 0, $limit);
-  echo $first_indicator . "\n";
   $not_emph = !(contains($current_line, $first_indicator));
   if($not_emph) {
     return -1;
@@ -279,5 +274,6 @@ function which_case($current_line) {
     return 2;
   }
 }
+
 
 ?>

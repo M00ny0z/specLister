@@ -27,7 +27,7 @@
     // IF TEXT HAS 4 SPACES BEFORE AND THE REST IS SPACE\N\N_4SPACES'''
     let overallSpec = document.getElementById("specField").value;
     //console.log(isCodeBlockDesc(overallSpec));
-    console.log(isCodeBlockDesc(overallSpec));
+    console.log(isCodeBlock(overallSpec));
     // if(isCodeBlock(overallSpec)) {
     //   let codeBlock = document.createElement("div");
     //   overallSpec = createCodeBlock(overallSpec, codeBlock);
@@ -361,7 +361,7 @@
       let currentChar = overallSpec.substring(0, 1);
       // IF DOESNT CUT NICELY INTO NEXT INDICATOR, CUTS AGAIN TO GET CLEAN CUT
       if(currentChar === "\n") {
-        let endCut = findNonIndicator(overallSpec);
+        let endCut = findNextIndicator(overallSpec);
         overallSpec = overallSpec.substring(endCut);
       } else if(currentChar === "#" && isHeader(overallSpec)) {
         // MINUS ONE TO NOT INCLUDE THE SPACE
@@ -374,7 +374,7 @@
         fullLines.push("SECTION" + headerNum + ":" + sectionName);
         //overallSpec = overallSpec.substring(sectionName.length + 1);
       } else if(currentChar != "*" && fullLines[fullLines.length - 1].startsWith("SECTION")){
-        let endCut = findNonIndicator(overallSpec);
+        let endCut = findNextIndicator(overallSpec);
         let desc = overallSpec.substring(0, endCut);
         fullLines.push("DESCRIPTION:" + desc);
         overallSpec = overallSpec.substring(desc.length);
@@ -385,8 +385,8 @@
           woutIndicator = overallSpec;
           additional = 0;
         }
-        let endCut = findNonIndicator(woutIndicator);
-        // APPLY THIS TO FINDNONINDICATOR
+        let endCut = findNextIndicator(woutIndicator);
+        // APPLY THIS TO findNextIndicator
         // if((woutIndicator.indexOf("##") < endCut) && woutIndicator.indexOf("##") != -1) {
         //   endCut = woutIndicator.indexOf("##");
         // }
@@ -410,34 +410,23 @@
     * @return {Integer} index - The index of the first character that indicates a new spec line
     *                           Returns -1 if not found
   */
-  function findNonIndicator(overallSpec) {
+  function findNextIndicator(overallSpec) {
     for(let i = 0; i < overallSpec.length; i++) {
-      let currentChar = overallSpec.charAt(i);
+      let currentChar = overallSpec.charAt(0);
       let remainder = overallSpec.substring(i);
-      if(i + 1 < overallSpec.length) {
-        if(currentChar === "*") {
-          if((overallSpec.charAt(i+1) != "*" && remainder.indexOf("* ") === 0)) {
-            return i;
-          } else {
-            i++;
-          }
-        } else if(isCodeBlockDesc(remainder) || isCodeBlock(remainder) || isHeader(remainder) || isNumberList(remainder)) {
-          if(isCodeBlockDesc(remainder) || isCodeBlock(remainder)) {
-            if(overallSpec.indexOf("```") === 0) {
-              // PLUS 6 TO INCLUDE THE ``` AT THE END
-              return overallSpec.substring(3).indexOf("```") + 6;
-            } else if(isCodeBlockDesc(remainder) && i === 0) {
-              // PLUS 3 TO INCLUDE THE ```
-              let first = overallSpec.substring(0, overallSpec.indexOf("```") + 3);
-              let second = overallSpec.substring(first.length).indexOf("```") + 3;
-              return first.length + second;
-            } else {
-              return i;
-            }
-          } else if(i != 0){
-            return i;
-          }
+      if(i === 0) {
+        if(isCodeBlock(overallSpec)) {
+          return overallSpec.substring(3).indexOf("```") + 6;
+        } else if(isCodeBlockDesc(overallSpec)) {
+          let first = overallSpec.substring(0, overallSpec.indexOf("```") + 3);
+          let second = overallSpec.substring(first.length).indexOf("```") + 3;
+          return first.length + second;
         }
+      } else {
+        if(isCodeBlock(remainder) || isCodeBlockDesc(remainder) || isHeader(remainder) ||
+            isNumberList(remainder) || remainder.indexOf("* ") === 0) {
+            return i;
+          }
       }
     }
     return -1;

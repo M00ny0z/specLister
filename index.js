@@ -372,7 +372,6 @@
         // REMOVES THE ## HEADING INDICATOR AND THE SPACE BETWEEN THE SECTION NAME
         let sectionName = headerLine.substring(headerNum + 1);
         fullLines.push("SECTION" + headerNum + ":" + sectionName);
-        //overallSpec = overallSpec.substring(sectionName.length + 1);
       } else if(currentChar != "*" && fullLines[fullLines.length - 1].startsWith("SECTION")){
         let endCut = findNextIndicator(overallSpec);
         let desc = overallSpec.substring(0, endCut);
@@ -386,10 +385,6 @@
           additional = 0;
         }
         let endCut = findNextIndicator(woutIndicator);
-        // APPLY THIS TO findNextIndicator
-        // if((woutIndicator.indexOf("##") < endCut) && woutIndicator.indexOf("##") != -1) {
-        //   endCut = woutIndicator.indexOf("##");
-        // }
         if(endCut === -1) {
           endCut = woutIndicator.length;
         }
@@ -412,7 +407,7 @@
   */
   function findNextIndicator(overallSpec) {
     for(let i = 0; i < overallSpec.length; i++) {
-      let currentChar = overallSpec.charAt(0);
+      let currentChar = overallSpec.charAt(i);
       let remainder = overallSpec.substring(i);
       if(i === 0) {
         if(isCodeBlock(overallSpec)) {
@@ -424,9 +419,15 @@
         }
       } else {
         if(isCodeBlock(remainder) || isCodeBlockDesc(remainder) || isHeader(remainder) ||
-            isNumberList(remainder) || remainder.indexOf("* ") === 0) {
+          isNumberList(remainder)) {
+          return i;
+        } else if(currentChar === "*") {
+          if(remainder.indexOf("* ") === 0) {
             return i;
+          } else {
+            i++;
           }
+        }
       }
     }
     return -1;

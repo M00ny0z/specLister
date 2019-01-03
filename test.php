@@ -5,13 +5,16 @@ error_reporting(E_ALL);
 check_new_file();
 
 if(isset($_GET["mode"]) && is_valid_mode($_GET["mode"])) {
-  header("Content-type: application/json");
-  $assignments = get_assignments();
-  $changes = check_if_changed();
-  $output = array();
-  $output["assignments"] = $assignments;
-  $output["changes"] = $changes;
-  echo json_encode($output);
+  $mode = $_GET["mode"];
+  if($mode == "getassigns") {
+    header("Content-type: application/json");
+    $output = get_assignments();
+    echo json_encode($output);
+  } else if($mode == "getspec" && isset($_GET["name"]) && is_valid_assign($_GET["name"])) {
+    header("Content-type: application/json");
+    $spec = json_decode(file_get_contents("PreFormat/" . $_GET["name"] . ".json"));
+    echo json_encode($spec);
+  }
 }
 
 function get_assignments() {
@@ -84,12 +87,13 @@ function get_name($file) {
 }
 
 function is_valid_mode($mode) {
-  return $mode === "getassigns";
+  $valid_modes = ["getassigns", "getspec"];
+  return in_array($mode, $valid_modes);
 }
 
 function is_valid_assign($assignment) {
   $assignments = get_assignments();
-  return in_array($assignment, $assingments);
+  return in_array($assignment, $assignments);
 }
 
 ?>

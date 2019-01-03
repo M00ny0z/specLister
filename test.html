@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css" />
+    <script src="lib.js"></script>
+    <script src="test.js"></script>
+    <title>Test</title>
+  </head>
+
+  <body>
+    <header>
+      <h1>UW CSE154 Specification Lister</h1>
+      <div class="d-flex justify-content-around">
+        <a href="https://courses.cs.washington.edu/courses/cse154/18au/">
+          <button type="button" class="btn btn-dark">Class Home Page</button>
+        </a>
+        <button id="save-btn" type="button" class="btn btn-dark">Save Progress</button>
+        <button id="remain-btn"type="button" class="btn btn-dark">Remaining Items</button>
+        <button id="remove-btn"type="button" class="btn btn-dark">Remove Completed Items</button>
+      </div>
+    </header>
+    <hr />
+
+    <main>
+
+      <div id="assign-cont" class="d-flex flex-wrap justify-content-center">
+      </div>
+
+      <div class="progress hidden">
+        <div class="progress-bar bg-danger" role="progressbar" style="width: 100%">Progress Bar</div>
+      </div>
+
+      <div id="remain-view">
+      </div>
+
+      <div id="completed-view" class="hidden">
+      </div>
+    </main>
+  </body>
+</html>

@@ -9,6 +9,7 @@ and also adds the styling for the different text formatting given by a spec
 html, body {
   height: 100%;
   width: 99%;
+  background-color: white !important;
 }
 
 textarea {
@@ -52,5 +53,5 @@ h1 {
 }
 
 .toRemove {
-  text-decoration: line-through;
+  text-decoration: line-through !important;
 }

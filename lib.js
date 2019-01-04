@@ -247,3 +247,36 @@ function findFirstLetter(toDo) {
   }
   return -1;
 }
+
+/*
+  RETURNS ALL HEADERS IN ORDER THEY WERE PLACED IN
+*/
+function getAllHeaders(parentElement) {
+  let output = [];
+  let allElements = parentElement.children;
+  for(let i = 0; i < allElements.length; i++) {
+    let currTag = allElements[i].tagName;
+    if(currTag === "H1" || currTag === "H2" || currTag === "H3" || currTag === "H4" ||
+      currTag === "H4" || currTag === "H5" || currTag === "H6") {
+      output.push(allElements[i]);
+    }
+  }
+  return output;
+}
+
+function getSpecificHeader(parentElement, name) {
+  let allHeaders = getAllHeaders(parentElement);
+  for(let i = 0; i < allHeaders.length; i++) {
+    if(allHeaders[i].classList.contains(name)) {
+      return allHeaders[i];
+    }
+  }
+}
+
+function getSectionName(element) {
+  for(let i = 0; i < 10; i++) {
+    if(element.classList.item(i) != "toRemove" && element.classList.item(i) != "spec-line") {
+      return element.classList.item(i);
+    }
+  }
+}

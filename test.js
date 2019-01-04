@@ -10,6 +10,7 @@
     let updateItems = document.getElementById("remove-btn");
     let showItems = document.getElementById("completed-btn");
     switchItems.addEventListener("click", switchStuff);
+    updateItems.addEventListener("click", updateList);
 
     fetch((URL + "?mode=getassigns"))
       .then(checkStatus)
@@ -18,14 +19,42 @@
       .catch(reportError);
   }
 
+  function updateList() {
+    let allToRemove = document.querySelectorAll(".toRemove");
+    let completedView = document.getElementById("completed-view");
+    let remainingView = document.getElementById("remain-view");
+    let otherParent;
+    if(completedView.classList.contains("hidden")) {
+      otherParent = completedView;
+    } else {
+      otherParent = remainingView;
+    }
+    for(let i = 0; i < allToRemove.length; i++) {
+      let section = getSpecificHeader(otherParent, getSectionName(allToRemove[i].parentElement.parentElement));
+      allToRemove[i].classList.remove("toRemove");
+      clearCheck(allToRemove[i]);
+      section.insertAdjacentElement("afterend", allToRemove[i].parentElement.parentElement);
+    }
+  }
+
+  function clearCheck(element) {
+    element.parentElement.querySelector("input").checked = false;
+  }
+
   function switchStuff() {
     let updateBttn = document.getElementById("remove-btn");
-    if(this.innerText === "Remaining Items") {
-      this.innerText = "Completed Items";
-      updateBttn.innerText = "Remove Completed Items";
-    } else {
-      this.innerText = "Remaining Items";
+    let completedView = document.getElementById("completed-view");
+    let remainingView = document.getElementById("remain-view");
+    if(this.innerText === "Show Completed Items") {
+      this.innerText = "Show Remaining Items";
       updateBttn.innerText = "Add Completed Items Back";
+      completedView.classList.remove("hidden");
+      remainingView.classList.add("hidden");
+    } else {
+      this.innerText = "Show Completed Items";
+      updateBttn.innerText = "Remove Completed Items";
+      completedView.classList.add("hidden");
+      remainingView.classList.remove("hidden");
     }
   }
 
@@ -42,7 +71,6 @@
       button.id = data[i];
       button.innerText = replaceAll(data[i], "_", " ");
       button.addEventListener("click", getAssignData);
-      console.log(button.innerText);
       buttonCont.appendChild(button);
     }
   }
@@ -102,6 +130,7 @@
   function addSpec(specByLines) {
     let specContainer = document.getElementById("remain-view");
     let progressBar = document.querySelector(".progress");
+    let prevSection = "";
     specContainer.innerHTML = "";
     count = 1;
     for(let i = 0; i < specByLines.length; i++) {
@@ -111,7 +140,10 @@
         let cleanText = replaceAll(currentLine, "\n", "");
         cleanText = cleanText.substring(cleanText.indexOf(":") + 1);
         if(currentLine.startsWith("SECTION")) {
+          prevSection = cleanText;
+          prevSection = replaceAll(prevSection, " ",  "_");
           newTextContainer = document.createElement("h" + currentLine.charAt(currentLine.indexOf(":") - 1));
+          newTextContainer.classList.add(prevSection);
           newTextContainer.innerText = cleanText;
         } else {
           newTextContainer = checkCodeByLetters(cleanText);
@@ -119,9 +151,10 @@
         specContainer.appendChild(newTextContainer);
       } else {
         let newLine = checkCodeByLetters(currentLine);
-        addLine(newLine, specContainer);
+        addLine(newLine, specContainer, prevSection);
       }
     }
+    copyHeaders();
     progressBar.classList.remove("hidden");
   }
 
@@ -130,9 +163,10 @@
     * @param {String} specLine - The single specification line to add
     * @param {String} container - The location to add the specification line too
   */
-  function addLine(specLine, container) {
+  function addLine(specLine, container, prevSection) {
     let div = document.createElement("div");
     div.classList.add("spec-line");
+    div.classList.add(prevSection);
     container.appendChild(div);
 
     let label = document.createElement("label");
@@ -177,18 +211,29 @@
     return specContainer;
   }
 
+  function copyHeaders() {
+    let completedView = document.getElementById("completed-view");
+    let remainingView = document.getElementById("remain-view");
+    let allHeaders = getAllHeaders(remainingView);
+    for(let i = 0; i < allHeaders.length; i++) {
+      let copy = allHeaders[i].cloneNode(true);
+      completedView.appendChild(copy);
+    }
+  }
+
+
   /**
     * Crosses out a corresponding specification requirement
   */
   function completeItem() {
     let finishedSpec = this.nextElementSibling;
     let parent = this.parentElement.parentElement;
-    parent.classList.add("toRemove");
-    if(finishedSpec.style.textDecoration === "line-through") {
-      finishedSpec.style.textDecoration = "none";
-    } else {
-      finishedSpec.style.textDecoration = "line-through";
-    }
+    finishedSpec.classList.toggle("toRemove");
+    updateBar();
+  }
+
+  function updateBar() {
+    
   }
 
 

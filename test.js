@@ -3,9 +3,26 @@
   window.addEventListener("load", main);
   const URL = "test.php"
   let count = 1;
+  let currentName;
   let headerCount = 0;
   let descCount = 0;
-  let lineCount = 0;
+  const db = new Dexie("assignment-database");
+  let assignment = "Set!";
+  let assi = [];
+  assi["assignments"] = 'name,values';
+  let na = "assignments";
+  console.log(assi);
+  db.version(1).stores(assi);
+  let infos = [1, 1, 1, 1];
+
+  db.assignments.put({name: "Set!", values: infos}).catch(function(error) {
+             //
+             // Finally don't forget to catch any error
+             // that could have happened anywhere in the
+             // code blocks above.
+             //
+             alert ("Ooops: " + error);
+          });
 
   function main() {
     let saveProgress = document.getElementById("save-btn");
@@ -14,6 +31,7 @@
     let showItems = document.getElementById("completed-btn");
     switchItems.addEventListener("click", switchStuff);
     updateItems.addEventListener("click", updateList);
+    saveProgress.addEventListener("click", saveItems);
 
     fetch((URL + "?mode=getassigns"))
       .then(checkStatus)
@@ -21,6 +39,42 @@
       .then(addAssignments)
       .catch(reportError);
   }
+
+  function saveItems() {
+    if(currentName === undefined) {
+      let nextTo = document.getElementById("assign-cont");
+      createAlert("You must start an assignment before you can save your progress", nextTo);
+    } else {
+      db.assignments.put({name: currentName, values: createReport()});
+    }
+  }
+
+  function createAlert(message, nextTo) {
+    let newAlert = document.createElement("div");
+    newAlert.classList.add("alert");
+    newAlert.classList.add("alert-danger");
+    newAlert.role="alert";
+    newAlert.innerText = message;
+    nextTo.insertAdjacentElement("afterend", newAlert);
+    setTimeout(function() {
+      nextTo.parentElement.removeChild(newAlert);
+    }, 2000);
+  }
+
+  function createReport() {
+    let completedView = document.getElementById("completed-view");
+    let allCompleted = completedView.querySelectorAll(".spec-line");
+    let output = [];
+    for(let i = 0; i < count - 1; i++) {
+      output[i] = 0;
+    }
+    for(let i = 0; i < allCompleted.length; i++) {
+      let currentNum = parseInt(allCompleted[i].querySelector("label").innerText);
+      output[currentNum - 1] = 1;
+    }
+    return output;
+  }
+
 
   function updateList() {
     let allToRemove = document.querySelectorAll(".toRemove");
@@ -39,6 +93,8 @@
       section.insertAdjacentElement("afterend", allToRemove[i].parentElement.parentElement);
     }
     updateBar();
+    let ans = createReport();
+    console.log(ans);
   }
 
   function clearCheck(element) {
@@ -80,6 +136,7 @@
   }
 
   function getAssignData() {
+    currentName = this.id;
     fetch(URL + "?mode=getspec&name=" + this.id)
       .then(checkStatus)
       .then(JSON.parse)
@@ -139,6 +196,7 @@
     specContainer.innerHTML = "";
     count = 1;
     colorBar.style.width = "0%";
+    descCount = 0;
     for(let i = 0; i < specByLines.length; i++) {
       let currentLine = specByLines[i]
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {
@@ -146,9 +204,7 @@
         let cleanText = replaceAll(currentLine, "\n", "");
         cleanText = cleanText.substring(cleanText.indexOf(":") + 1);
         if(currentLine.startsWith("SECTION")) {
-          console.log("headerCount before: " + headerCount);
           headerCount = headerCount + 1;
-          console.log("headerCount after: " + headerCount);
           prevSection = cleanText;
           prevSection = replaceAll(prevSection, " ",  "_");
           newTextContainer = document.createElement("h" + currentLine.charAt(currentLine.indexOf(":") - 1));
@@ -158,6 +214,7 @@
           descCount = descCount + 1;
           newTextContainer = checkCodeByLetters(cleanText);
         }
+        newTextContainer.classList.add("ml-2");
         specContainer.appendChild(newTextContainer);
       } else {
         let newLine = checkCodeByLetters(currentLine);
@@ -166,7 +223,18 @@
     }
     copyHeaders();
     progressBar.classList.remove("hidden");
+    console.log(currentName);
   }
+
+  // function addToDB() {
+  //   db.assignments.get(currentName, function(data) {
+  //     if(data === undefined) {
+  //       add normally;
+  //     } else {
+  //       db.assignments.update()
+  //     }
+  //   })
+  // }
 
   /**
     * Adds the single specification line to the page
@@ -243,11 +311,9 @@
 
   function updateBar() {
     let progressBar = document.querySelector(".progress-bar");
-    console.log(progressBar);
     let completedCount = document.getElementById("completed-view").children.length - headerCount;
     let total = count - 1;
     let percentage = ((completedCount / total) * 100);
-    console.log(percentage);
     if(percentage >= 25 && percentage < 100) {
       progressBar.classList.remove("bg-danger");
       progressBar.classList.add("bg-warning");

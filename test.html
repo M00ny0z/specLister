@@ -3,6 +3,7 @@
   <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css" />
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
     <script src="lib.js"></script>
     <script src="test.js"></script>
     <title>Test</title>
@@ -22,13 +23,23 @@
     </header>
     <hr />
 
-    <main>
+    <main class="d-flex flex-column">
 
-      <div id="assign-cont" class="d-flex flex-wrap justify-content-center">
+      <div id="assign-cont" class="d-flex flex-wrap justify-content-center align-self-center">
       </div>
 
+      <p class="align-self-center">
+        Welcome to SpecLister! The goal of the website is to help you keep track of your progress
+        on your CSE 154 assignments. <br />
+        <strong>NOTE: </strong>Using SpecLister <strong>DOES NOT</strong> guarantee full points on
+        any assignment. <br />
+
+        Click on any assignment and it will load a todo list for the entire assignment.
+        You can go between your completed items and your remaining items.
+      </p>
+
       <div class="progress hidden">
-        <div class="progress-bar bg-danger" role="progressbar" style="width: 100%">Progress Bar</div>
+        <div class="progress-bar bg-danger" role="progressbar" style="width: 0%">Progress Bar</div>
       </div>
 
       <div id="remain-view">

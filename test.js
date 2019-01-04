@@ -3,6 +3,9 @@
   window.addEventListener("load", main);
   const URL = "test.php"
   let count = 1;
+  let headerCount = 0;
+  let descCount = 0;
+  let lineCount = 0;
 
   function main() {
     let saveProgress = document.getElementById("save-btn");
@@ -35,6 +38,7 @@
       clearCheck(allToRemove[i]);
       section.insertAdjacentElement("afterend", allToRemove[i].parentElement.parentElement);
     }
+    updateBar();
   }
 
   function clearCheck(element) {
@@ -130,9 +134,11 @@
   function addSpec(specByLines) {
     let specContainer = document.getElementById("remain-view");
     let progressBar = document.querySelector(".progress");
+    let colorBar = document.querySelector(".progress-bar");
     let prevSection = "";
     specContainer.innerHTML = "";
     count = 1;
+    colorBar.style.width = "0%";
     for(let i = 0; i < specByLines.length; i++) {
       let currentLine = specByLines[i]
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {
@@ -140,12 +146,16 @@
         let cleanText = replaceAll(currentLine, "\n", "");
         cleanText = cleanText.substring(cleanText.indexOf(":") + 1);
         if(currentLine.startsWith("SECTION")) {
+          console.log("headerCount before: " + headerCount);
+          headerCount = headerCount + 1;
+          console.log("headerCount after: " + headerCount);
           prevSection = cleanText;
           prevSection = replaceAll(prevSection, " ",  "_");
           newTextContainer = document.createElement("h" + currentLine.charAt(currentLine.indexOf(":") - 1));
           newTextContainer.classList.add(prevSection);
           newTextContainer.innerText = cleanText;
         } else {
+          descCount = descCount + 1;
           newTextContainer = checkCodeByLetters(cleanText);
         }
         specContainer.appendChild(newTextContainer);
@@ -229,11 +239,24 @@
     let finishedSpec = this.nextElementSibling;
     let parent = this.parentElement.parentElement;
     finishedSpec.classList.toggle("toRemove");
-    updateBar();
   }
 
   function updateBar() {
-    
+    let progressBar = document.querySelector(".progress-bar");
+    console.log(progressBar);
+    let completedCount = document.getElementById("completed-view").children.length - headerCount;
+    let total = count - 1;
+    let percentage = ((completedCount / total) * 100);
+    console.log(percentage);
+    if(percentage >= 25 && percentage < 100) {
+      progressBar.classList.remove("bg-danger");
+      progressBar.classList.add("bg-warning");
+    } else if(percentage >= 100) {
+      progressBar.classList.remove("bg-warning");
+      progressBar.classList.add("bg-success");
+    }
+    progressBar.style.width = (percentage + "%");
+
   }
 
 

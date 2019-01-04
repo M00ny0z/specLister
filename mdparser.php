@@ -243,6 +243,9 @@ function combine_lines($overallSpec) {
       array_push($full_lines, "SECTION" . $header_num . ":" . $section_name);
     } else if($current_char != "*" && starts_with($full_lines[sizeof($full_lines) - 1], "SECTION")) { // CURRENT LINE BEING WORKED ON
       $end_cut = find_next_indicator($overallSpec);
+      if($end_cut == -1) {
+        $end_cut = strlen($overallSpec);
+      }
       $desc = substring($overallSpec, 0, $end_cut);
       array_push($full_lines, "DESCRIPTION:" . $desc);
       $overallSpec = sub_remain($overallSpec, strlen($desc));

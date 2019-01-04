@@ -18,7 +18,7 @@ function checkCodeByLetters(currentLine) {
       // SIMPLY ADDS THE SPACE
       specContainer.innerHTML = specContainer.innerHTML + currentChar;
       currentLine = currentLine.substring(1);
-    } else if ((currentChar === "*" || currentChar === "_") && whichCase(currentLine) != -1) {
+    } else if (isEmphasis(currentLine)) {
       // HANDLES EMPHASIS CASE
       currentLine = addEmphasis(currentLine, specContainer);
     } else {
@@ -26,6 +26,11 @@ function checkCodeByLetters(currentLine) {
     }
   }
   return specContainer;
+}
+
+function isEmphasis(currentLine) {
+  let currentChar = currentLine.charAt(0);
+  return (currentChar === "*" || currentChar === "_") && whichCase(currentLine) != -1;
 }
 
 /**
@@ -71,7 +76,7 @@ function isLink(currentLine) {
 */
 function addWord(currentLine, container) {
   let count = 0;
-  let endCut = currentLine.indexOf(" ");
+  let endCut = findNextMdChar(currentLine);
   // HANDLES IF AT THE END OF THE STRING
   if(endCut === -1) {
     endCut = currentLine.length;
@@ -80,6 +85,20 @@ function addWord(currentLine, container) {
   container.innerHTML = container.innerHTML + addWord;
   count = addWord.length;
   return currentLine.substring(count);
+}
+
+function findNextMdChar(currentLine) {
+  for(let i = 0; i < currentLine.length; i++) {
+    currentChar = currentLine.charAt(i);
+    remainder = currentLine.substring(i);
+    if(isMDLink(remainder) || currentChar === "`" || isEmphasis(remainder) || currentChar === " ") {
+      return i;
+    }
+  }
+}
+
+function isMDLink(currentLine) {
+  return (currentLine.charAt(0) === "(" && currentLine.indexOf(")") + 1 === "[");
 }
 
 /**

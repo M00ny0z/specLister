@@ -9,7 +9,7 @@
     let switchItems = document.getElementById("remain-btn");
     let updateItems = document.getElementById("remove-btn");
     let showItems = document.getElementById("completed-btn");
-    updateItems.addEventListener("click", switchStuff);
+    switchItems.addEventListener("click", switchStuff);
 
     fetch((URL + "?mode=getassigns"))
       .then(checkStatus)
@@ -19,14 +19,16 @@
   }
 
   function switchStuff() {
+    let updateBttn = document.getElementById("remove-btn");
     if(this.innerText === "Remaining Items") {
       this.innerText = "Completed Items";
+      updateBttn.innerText = "Remove Completed Items";
     } else {
       this.innerText = "Remaining Items";
+      updateBttn.innerText = "Add Completed Items Back";
     }
   }
 
-  function removeItem
 
   function addAssignments(data) {
     let buttonCont = document.getElementById("assign-cont");
@@ -101,6 +103,7 @@
     let specContainer = document.getElementById("remain-view");
     let progressBar = document.querySelector(".progress");
     specContainer.innerHTML = "";
+    count = 1;
     for(let i = 0; i < specByLines.length; i++) {
       let currentLine = specByLines[i]
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {

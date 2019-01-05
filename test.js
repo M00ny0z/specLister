@@ -24,6 +24,10 @@
              alert ("Ooops: " + error);
           });
 
+  /**
+  * Initializes all of the menu buttons and fetches the server for the names of the current
+  * assignments
+  */
   function main() {
     let saveProgress = document.getElementById("save-btn");
     let switchItems = document.getElementById("remain-btn");
@@ -40,16 +44,23 @@
       .catch(reportError);
   }
 
+  /**
+    * Saves the current user progress for the current assignment
+  */
   function saveItems() {
     if(currentName === undefined) {
-      let nextTo = document.getElementById("assign-cont");
-      createAlert("You must start an assignment before you can save your progress", nextTo);
+      createAlert("You must start an assignment before you can save your progress");
     } else {
       db.assignments.put({name: currentName, values: createReport()});
     }
   }
 
-  function createAlert(message, nextTo) {
+  /**
+    * Creates an alert depending on the message passed, removes it after 2 seconds
+    * @param {String} message - The message to include in the alert
+  */
+  function createAlert(message) {
+    let nextTo = document.getElementById("assign-cont");
     let newAlert = document.createElement("div");
     newAlert.classList.add("alert");
     newAlert.classList.add("alert-danger");
@@ -61,6 +72,11 @@
     }, 2000);
   }
 
+  /**
+    * Creates and returns an array of the status' for all the requirements for the assignment
+    * @return {intArray} output - An array of all the status' of the current assignment,
+    *                             0 for not complete, 1 for complete
+  */
   function createReport() {
     let completedView = document.getElementById("completed-view");
     let allCompleted = completedView.querySelectorAll(".spec-line");
@@ -75,7 +91,10 @@
     return output;
   }
 
-
+  /**
+    * Updates the list by removing items specified by the user
+    * Moves from remainingItems view to completedItems view depending on current menu
+  */
   function updateList() {
     let allToRemove = document.querySelectorAll(".toRemove");
     let completedView = document.getElementById("completed-view");
@@ -97,10 +116,18 @@
     console.log(ans);
   }
 
+  /**
+    * Clears the checkmark from a specified spec line
+    * @param {HTMLElement} element - The checkbox to clear
+  */
   function clearCheck(element) {
     element.parentElement.querySelector("input").checked = false;
   }
 
+  /**
+    * Switches the labeling for the menu buttons for visibility
+    * Switches from the remainingItems view to completedItems view and vice-versa
+  */
   function switchStuff() {
     let updateBttn = document.getElementById("remove-btn");
     let completedView = document.getElementById("completed-view");
@@ -118,7 +145,11 @@
     }
   }
 
-
+  /**
+    * Populates the page with buttons of all the names of the assignments
+    * Each button calls the server for the spec data
+    * @param {StringArray} data - All of the assignments to add
+  */
   function addAssignments(data) {
     let buttonCont = document.getElementById("assign-cont");
     for(let i = 0; i < data.length; i++) {
@@ -135,7 +166,11 @@
     }
   }
 
+  /**
+    * Fetches the specified assignment data from the server
+  */
   function getAssignData() {
+    document.getElementById("welcome-msg").classList.add("hidden");
     currentName = this.id;
     fetch(URL + "?mode=getspec&name=" + this.id)
       .then(checkStatus)
@@ -181,24 +216,48 @@
     * @param {String} error - The error reported by the fetch call
   */
   function reportError(error) {
-    console.log(error);
+    createAlert("An error has occurred, please try again. : " + error);
   }
 
   /**
-    * Populates the page with only actual requirement lines from the spec
-    * @param {String} overallSpec - The entire specification given by the user
+    * Reports the error given by the fetch call
+    * @param {String} error - The error reported by the fetch call
   */
-  function addSpec(specByLines) {
+  function resetStats() {
     let specContainer = document.getElementById("remain-view");
+    let completedView = document.getElementById("completed-view");
     let progressBar = document.querySelector(".progress");
     let colorBar = document.querySelector(".progress-bar");
-    let prevSection = "";
     specContainer.innerHTML = "";
     count = 1;
     colorBar.style.width = "0%";
     descCount = 0;
+    completedView.innerHTML = "";
+  }
+
+  /**
+    * Populates the page with only actual requirement lines from the spec given by the server
+    * @param {StringArray} specByLines - The entire specification for the assignment in an array,
+    *                                    each index being a requirement
+  */
+  function addSpec(specByLines) {
+    resetStats();
+    let remainingView = document.getElementById("remain-view");
+    let completedView = document.getElementById("completed-view");
+    let specContainer = remainingView;
+    let progressBar = document.querySelector(".progress");
+    let prevSection = "";
     for(let i = 0; i < specByLines.length; i++) {
-      let currentLine = specByLines[i]
+      db.assignments.get(currentName, function(item) {
+        if(item != undefined) {
+          if(item.values[i] === 1) {
+            specContainer = completedView;
+          } else {
+            specContainer = remainingView;
+          }
+        }
+      });
+      let currentLine = specByLines[i];
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {
         let newTextContainer;
         let cleanText = replaceAll(currentLine, "\n", "");
@@ -226,20 +285,12 @@
     console.log(currentName);
   }
 
-  // function addToDB() {
-  //   db.assignments.get(currentName, function(data) {
-  //     if(data === undefined) {
-  //       add normally;
-  //     } else {
-  //       db.assignments.update()
-  //     }
-  //   })
-  // }
 
   /**
     * Adds the single specification line to the page
     * @param {String} specLine - The single specification line to add
     * @param {String} container - The location to add the specification line too
+    * @param {String} prevSection - The section that the line belongs too
   */
   function addLine(specLine, container, prevSection) {
     let div = document.createElement("div");
@@ -289,6 +340,10 @@
     return specContainer;
   }
 
+  /**
+    * Copies all the headers of the assignment and appends them in original placed length to the
+    * completed items view
+  */
   function copyHeaders() {
     let completedView = document.getElementById("completed-view");
     let remainingView = document.getElementById("remain-view");
@@ -309,6 +364,9 @@
     finishedSpec.classList.toggle("toRemove");
   }
 
+  /**
+    * Updates the bar progression depending on the user progress
+  */
   function updateBar() {
     let progressBar = document.querySelector(".progress-bar");
     let completedCount = document.getElementById("completed-view").children.length - headerCount;

@@ -28,6 +28,11 @@ function checkCodeByLetters(currentLine) {
   return specContainer;
 }
 
+/**
+  * Returns whether the front of the current line is a MD emphasis or not
+  * @param {String} currentLine - The current specification line being looked at
+  * @return {Boolean} currentLine - True if an MD emphasis, false otherwise
+*/
 function isEmphasis(currentLine) {
   let currentChar = currentLine.charAt(0);
   return (currentChar === "*" || currentChar === "_") && whichCase(currentLine) != -1;
@@ -87,6 +92,11 @@ function addWord(currentLine, container) {
   return currentLine.substring(count);
 }
 
+/**
+  * Returns the index of the next MD style indicator
+  * @param {String} currentLine - The current specification line being looked at
+  * @return {Integer} - The index of the next MD style indicator
+*/
 function findNextMdChar(currentLine) {
   for(let i = 0; i < currentLine.length; i++) {
     currentChar = currentLine.charAt(i);
@@ -97,6 +107,12 @@ function findNextMdChar(currentLine) {
   }
 }
 
+/**
+  * Returns whether the front of the currentLine has a markdown style link,
+  * true if yes, false otherwise
+  * @param {String} currentLine - The currentLine with the text to add at the front
+  * @return {Boolean} - Whether or not the front of currentLine is a markdown style link
+*/
 function isMDLink(currentLine) {
   return (currentLine.charAt(0) === "(" && currentLine.indexOf(")") + 1 === "[");
 }
@@ -248,8 +264,10 @@ function findFirstLetter(toDo) {
   return -1;
 }
 
-/*
-  RETURNS ALL HEADERS IN ORDER THEY WERE PLACED IN
+/**
+  * Returns an array of all the element that are headers within a parent element
+  * @param {HTMLElement} parentElement - The parent element to get headers from
+  * @return {HTMLElementArray} output - The array of all the elements that are headers
 */
 function getAllHeaders(parentElement) {
   let output = [];
@@ -264,6 +282,12 @@ function getAllHeaders(parentElement) {
   return output;
 }
 
+/**
+  * Returns the name of the section of the spec line
+  * @param {HTMLElement} parentElement - The specification line to get the section name for
+  * @param {String} name - The header name that is being looked for
+  * @return {HTMLElement} - The header with the specified name
+*/
 function getSpecificHeader(parentElement, name) {
   let allHeaders = getAllHeaders(parentElement);
   for(let i = 0; i < allHeaders.length; i++) {
@@ -273,6 +297,11 @@ function getSpecificHeader(parentElement, name) {
   }
 }
 
+/**
+  * Returns the name of the section of the spec line
+  * @param {HTMLElement} element - The specification line to get the section name for
+  * @return {String} index - The name of the specification line's section
+*/
 function getSectionName(element) {
   for(let i = 0; i < 10; i++) {
     if(element.classList.item(i) != "toRemove" && element.classList.item(i) != "spec-line") {

@@ -20,9 +20,10 @@
     let saveProgress = document.getElementById("save-btn");
     let switchItems = document.getElementById("remain-btn");
     let updateItems = document.getElementById("remove-btn");
-    let showItems = document.getElementById("completed-btn");
     switchItems.addEventListener("click", switchStuff);
+    switchItems.disabled = true;
     updateItems.addEventListener("click", updateList);
+    updateItems.disabled = true;
     saveProgress.addEventListener("click", saveItems);
 
     fetch((URL + "?mode=getassigns"))
@@ -37,7 +38,7 @@
   */
   function saveItems() {
     if(currentName === undefined) {
-      createAlert("You must start an assignment before you can save your progress");
+      createAlert("You must start an assignment before you can save your progress", "alert-danger");
     } else {
       db.assignments.put({name: currentName, values: createReport()});
       successAlert("Successfully saved!");
@@ -94,22 +95,25 @@
   */
   function updateList() {
     let allToRemove = document.querySelectorAll(".toRemove");
-    let completedView = document.getElementById("completed-view");
-    let remainingView = document.getElementById("remain-view");
-    let otherParent;
-    if(completedView.classList.contains("hidden")) {
-      otherParent = completedView;
+    if(allToRemove.length <= 0) {
+      redAlert("You must have completed some items before you can remove them.");
     } else {
-      otherParent = remainingView;
+      let completedView = document.getElementById("completed-view");
+      let remainingView = document.getElementById("remain-view");
+      let otherParent;
+      if(completedView.classList.contains("hidden")) {
+        otherParent = completedView;
+      } else {
+        otherParent = remainingView;
+      }
+      for(let i = allToRemove.length - 1; i >= 0; i--) {
+        let section = getSpecificHeader(otherParent, getSectionName(allToRemove[i].parentElement.parentElement));
+        allToRemove[i].classList.remove("toRemove");
+        clearCheck(allToRemove[i]);
+        section.insertAdjacentElement("afterend", allToRemove[i].parentElement.parentElement);
+      }
+      updateBar();
     }
-    for(let i = allToRemove.length - 1; i >= 0; i--) {
-      let section = getSpecificHeader(otherParent, getSectionName(allToRemove[i].parentElement.parentElement));
-      allToRemove[i].classList.remove("toRemove");
-      clearCheck(allToRemove[i]);
-      section.insertAdjacentElement("afterend", allToRemove[i].parentElement.parentElement);
-    }
-    updateBar();
-    let ans = createReport();
   }
 
   /**
@@ -166,6 +170,10 @@
     * Fetches the specified assignment data from the server
   */
   function getAssignData() {
+    let switchItems = document.getElementById("remain-btn");
+    let updateItems = document.getElementById("remove-btn");
+    switchItems.disabled = false;
+    updateItems.disabled = false;
     document.getElementById("welcome-msg").classList.add("hidden");
     currentName = this.id;
     fetch(URL + "?mode=getspec&name=" + this.id)

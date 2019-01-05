@@ -40,6 +40,7 @@
       createAlert("You must start an assignment before you can save your progress");
     } else {
       db.assignments.put({name: currentName, values: createReport()});
+      successAlert("Successfully saved!");
     }
   }
 
@@ -47,17 +48,25 @@
     * Creates an alert depending on the message passed, removes it after 2 seconds
     * @param {String} message - The message to include in the alert
   */
-  function createAlert(message) {
+  function createAlert(message, type) {
     let nextTo = document.getElementById("assign-cont");
     let newAlert = document.createElement("div");
     newAlert.classList.add("alert");
-    newAlert.classList.add("alert-danger");
     newAlert.role="alert";
+    newAlert.classList.add(type);
     newAlert.innerText = message;
     nextTo.insertAdjacentElement("afterend", newAlert);
     setTimeout(function() {
       nextTo.parentElement.removeChild(newAlert);
     }, 2000);
+  }
+
+  function redAlert(message) {
+    createAlert(message, "alert-danger");
+  }
+
+  function successAlert(message) {
+    createAlert(message, "alert-success");
   }
 
   /**
@@ -101,7 +110,6 @@
     }
     updateBar();
     let ans = createReport();
-    console.log(ans);
   }
 
   /**
@@ -204,7 +212,7 @@
     * @param {String} error - The error reported by the fetch call
   */
   function reportError(error) {
-    createAlert("An error has occurred, please try again. : " + error);
+    redAlert("An error has occurred, please try again. : " + error);
   }
 
   /**
@@ -220,6 +228,7 @@
     count = 1;
     colorBar.style.width = "0%";
     descCount = 0;
+    headerCount = 0;
     completedView.innerHTML = "";
   }
 
@@ -365,6 +374,9 @@
     let progressBar = document.querySelector(".progress-bar");
     let completedCount = document.getElementById("completed-view").children.length - headerCount;
     let total = count - 1;
+    console.log("completedCount: " + completedCount);
+    console.log("total: " + total);
+    console.log("percentage: " + ((completedCount / total) * 100));
     let percentage = ((completedCount / total) * 100);
     if(percentage >= 25 && percentage < 100) {
       progressBar.classList.remove("bg-danger");

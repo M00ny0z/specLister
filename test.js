@@ -10,19 +10,7 @@
   let assignment = "Set!";
   let assi = [];
   assi["assignments"] = 'name,values';
-  let na = "assignments";
-  console.log(assi);
   db.version(1).stores(assi);
-  let infos = [1, 1, 1, 1];
-
-  db.assignments.put({name: "Set!", values: infos}).catch(function(error) {
-             //
-             // Finally don't forget to catch any error
-             // that could have happened anywhere in the
-             // code blocks above.
-             //
-             alert ("Ooops: " + error);
-          });
 
   /**
   * Initializes all of the menu buttons and fetches the server for the names of the current
@@ -105,7 +93,7 @@
     } else {
       otherParent = remainingView;
     }
-    for(let i = 0; i < allToRemove.length; i++) {
+    for(let i = allToRemove.length - 1; i >= 0; i--) {
       let section = getSpecificHeader(otherParent, getSectionName(allToRemove[i].parentElement.parentElement));
       allToRemove[i].classList.remove("toRemove");
       clearCheck(allToRemove[i]);
@@ -248,15 +236,6 @@
     let progressBar = document.querySelector(".progress");
     let prevSection = "";
     for(let i = 0; i < specByLines.length; i++) {
-      db.assignments.get(currentName, function(item) {
-        if(item != undefined) {
-          if(item.values[i] === 1) {
-            specContainer = completedView;
-          } else {
-            specContainer = remainingView;
-          }
-        }
-      });
       let currentLine = specByLines[i];
       if(currentLine.startsWith("SECTION") || currentLine.startsWith("DESCRIPTION:")) {
         let newTextContainer;
@@ -281,10 +260,25 @@
       }
     }
     copyHeaders();
+    db.assignments.get(currentName, function(item) {
+      if(item != undefined) {
+        returnProgress(item);
+      }
+    });
     progressBar.classList.remove("hidden");
-    console.log(currentName);
   }
 
+  function returnProgress(data) {
+    let allSpecLines = document.getElementById("remain-view").querySelectorAll(".spec-line");
+    let completedView = document.getElementById("completed-view");
+    for(let i = data.values.length - 1; i > -1 ; i--) {
+      if(data.values[i] === 1) {
+        let section = getSpecificHeader(completedView, getSectionName(allSpecLines[i]));
+        section.insertAdjacentElement("afterend", allSpecLines[i]);
+      }
+    }
+    updateBar();
+  }
 
   /**
     * Adds the single specification line to the page

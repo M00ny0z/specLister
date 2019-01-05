@@ -273,13 +273,17 @@ function getAllHeaders(parentElement) {
   let output = [];
   let allElements = parentElement.children;
   for(let i = 0; i < allElements.length; i++) {
-    let currTag = allElements[i].tagName;
-    if(currTag === "H1" || currTag === "H2" || currTag === "H3" || currTag === "H4" ||
-      currTag === "H4" || currTag === "H5" || currTag === "H6") {
+    if(ifHeader(allElements[i])) {
       output.push(allElements[i]);
     }
   }
   return output;
+}
+
+function ifHeader(element) {
+  let currTag = element.tagName;
+  return (currTag === "H1" || currTag === "H2" || currTag === "H3" || currTag === "H4" ||
+    currTag === "H4" || currTag === "H5" || currTag === "H6");
 }
 
 /**
